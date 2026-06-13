@@ -373,9 +373,15 @@
 
         <form id="contactForm" novalidate>
           <div class="field">
-            <label for="name">Name</label>
-            <input type="text" id="name" name="name" autocomplete="name" placeholder="Max Mustermann" />
-            <span class="error" id="err-name">Bitte gib deinen Namen ein.</span>
+            <label for="firstName">Vorname</label>
+            <input type="text" id="firstName" name="firstName" autocomplete="given-name" placeholder="Max" />
+            <span class="error" id="err-firstName">Bitte gib deinen Vornamen ein.</span>
+          </div>
+
+          <div class="field">
+            <label for="lastName">Nachname</label>
+            <input type="text" id="lastName" name="lastName" autocomplete="family-name" placeholder="Mustermann" />
+            <span class="error" id="err-lastName">Bitte gib deinen Nachnamen ein.</span>
           </div>
 
           <div class="field">
@@ -585,24 +591,27 @@
   }
 
   function validateForm() {
-    const name = $("name").value.trim();
+    const firstName = $("firstName").value.trim();
+    const lastName = $("lastName").value.trim();
     const email = $("email").value.trim();
     const phone = $("phone").value.trim();
     const consent = $("consent").checked;
 
-    const nameOk = name.length >= 2;
+    const firstOk = firstName.length >= 2;
+    const lastOk = lastName.length >= 2;
     const emailOk = EMAIL_RE.test(email);
     // simple Telefon-Prüfung: erlaubte Zeichen + mind. 6 Ziffern
     const phoneDigits = (phone.match(/\d/g) || []).length;
     const phoneOk = /^[+()\/\s.\-\d]+$/.test(phone) && phoneDigits >= 6;
 
-    setError("name", "err-name", !nameOk);
+    setError("firstName", "err-firstName", !firstOk);
+    setError("lastName", "err-lastName", !lastOk);
     setError("email", "err-email", !emailOk);
     setError("phone", "err-phone", !phoneOk);
     $("err-consent").classList.toggle("show", !consent);
     $("consentLabel").classList.toggle("invalid", !consent);
 
-    return nameOk && emailOk && phoneOk && consent;
+    return firstOk && lastOk && emailOk && phoneOk && consent;
   }
 
   /* =======================================================================
@@ -629,7 +638,8 @@
       score_label: s.label,
       answers: answers,
       contact: {
-        name: $("name").value.trim(),
+        first_name: $("firstName").value.trim(),
+        last_name: $("lastName").value.trim(),
         email: $("email").value.trim(),
         phone: $("phone").value.trim(),
       },
@@ -683,8 +693,8 @@
     $("scorePts").textContent = "von 100";
     $("scoreLabel").textContent = s.label;
     $("scoreRing").style.setProperty("--p", s.percent);
-    const name = $("name").value.trim();
-    $("resultName").textContent = name ? name.split(" ")[0] : "du";
+    const first = $("firstName").value.trim();
+    $("resultName").textContent = first || "du";
     state.submitted = true;
     showScreen("result");
   }
@@ -731,7 +741,7 @@
     $("contactForm").addEventListener("submit", handleSubmit);
 
     // Live-Fehler ausblenden, sobald der Nutzer korrigiert
-    ["name", "email", "phone"].forEach(id => {
+    ["firstName", "lastName", "email", "phone"].forEach(id => {
       $(id).addEventListener("input", () => {
         $(id).classList.remove("invalid");
         $("err-" + id).classList.remove("show");
